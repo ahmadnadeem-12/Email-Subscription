@@ -6,6 +6,9 @@ Video Link
 
 https://www.youtube.com/watch?v=a8Om25FbaJA&list=PLjwm_8O3suyOgDS_Z8AWbbq3zpCmR-WE9&index=19
 
+Excel Sheet Link
+
+https://docs.google.com/spreadsheets/d/1MNBZbN_DHO3BxxtdtjJMMHBwTBWJYGsvq0v5Xavvhs0/edit?gid=0#gid=0
 
 How to Fetch Email By User 
 
@@ -81,4 +84,5 @@ function doPost (e) {
       .then(response => console.log('Success!', response))
       .catch(error => console.error('Error!', error.message))
   })
+
 </script>
