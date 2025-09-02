@@ -1,0 +1,84 @@
+GitHub Link For Email using Spread Sheet
+
+https://github.com/jamiewilson/form-to-google-sheets
+
+Video Link 
+
+https://www.youtube.com/watch?v=a8Om25FbaJA&list=PLjwm_8O3suyOgDS_Z8AWbbq3zpCmR-WE9&index=19
+
+
+How to Fetch Email By User 
+
+* Create new Spread Sheet and write title 
+* Go to extensions > App Script 
+* Paste Below code  > Change their title also  and save the project 
+* Run the script > Give all permissions and click on > Deploy 
+* New Deployment > Select type > Setting > Web App > Email List in description 
+* Give access to anyone > Click on Deploy > Give all permissions > Copy Web Link
+* Paste in Second Code script URL 
+
+
+////////////    Code Here Below    \\\\\\\\\\\\\
+
+var sheetName = 'Sheet1'
+var scriptProp = PropertiesService.getScriptProperties()
+
+function intialSetup () {
+  var activeSpreadsheet = SpreadsheetApp.getActiveSpreadsheet()
+  scriptProp.setProperty('key', activeSpreadsheet.getId())
+}
+
+function doPost (e) {
+  var lock = LockService.getScriptLock()
+  lock.tryLock(10000)
+
+  try {
+    var doc = SpreadsheetApp.openById(scriptProp.getProperty('key'))
+    var sheet = doc.getSheetByName(sheetName)
+
+    var headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0]
+    var nextRow = sheet.getLastRow() + 1
+
+    var newRow = headers.map(function(header) {
+      return header === 'timestamp' ? new Date() : e.parameter[header]
+    })
+
+    sheet.getRange(nextRow, 1, 1, newRow.length).setValues([newRow])
+
+    return ContentService
+      .createTextOutput(JSON.stringify({ 'result': 'success', 'row': nextRow }))
+      .setMimeType(ContentService.MimeType.JSON)
+  }
+
+  catch (e) {
+    return ContentService
+      .createTextOutput(JSON.stringify({ 'result': 'error', 'error': e }))
+      .setMimeType(ContentService.MimeType.JSON)
+  }
+
+  finally {
+    lock.releaseLock()
+  }
+}
+
+
+
+///////////// The Second code from same GitHub \\\\\\\\\\\\\
+
+
+<form name="submit-to-google-sheet">
+  <input name="email" type="email" placeholder="Email" required>
+  <button type="submit">Send</button>
+</form>
+
+<script>
+  const scriptURL = '<SCRIPT URL>'
+  const form = document.forms['submit-to-google-sheet']
+
+  form.addEventListener('submit', e => {
+    e.preventDefault()
+    fetch(scriptURL, { method: 'POST', body: new FormData(form)})
+      .then(response => console.log('Success!', response))
+      .catch(error => console.error('Error!', error.message))
+  })
+</script>
